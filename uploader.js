@@ -1,11 +1,15 @@
+require('dotenv').config()
 const AWS = require('aws-sdk')
 const fs = require('fs')
+const path = require('path')
+const fileDir =  path.join(__dirname, 'files')
 
 const credentials = new AWS.SharedIniFileCredentials({
-    profile: 's3backup'
+    profile: process.env.AWS_CREDENTIALS_PROFILE
 })
 
 AWS.config.credentials = credentials
+
 AWS.config.getCredentials(err => {
     if (err) {
         return console.log(err.stack)
@@ -14,19 +18,24 @@ AWS.config.getCredentials(err => {
     console.log('Access key: ', AWS.config.credentials.accessKeyId)
 
     const s3 = new AWS.S3()
-    const file = fs.readFileSync('backup.txt')
+    const files = fs.readdirSync(fileDir)
 
-    const params = {
-        Bucket: 'kumuangproperties',
-        Key: 'backup.txt',
-        Body: file
-    }
+    files.forEach(filename => {
+        let filepath = path.join(fileDir, filename)
+        let file = fs.readFileSync(filepath)
 
-    s3.upload(params, (err, data) => {
-        if (err) {
-            return console.log(err)
+        let params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: filename,
+            Body: file
         }
 
-        console.log(`File uploaded to ${data.Location}`)
+        s3.upload(params, (err, data) => {
+            if (err) {
+                return console.log(err)
+            }
+
+            console.log(`File uploaded to ${data.Location}`)
+        })
     })
 })
