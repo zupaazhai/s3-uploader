@@ -1,0 +1,25 @@
+{
+  "name": "s3-backup",
+  "version": "1.0.0",
+  "description": "upload file to s3 bucket",
+  "main": "uploader.js",
+  "dependencies": {
+    "aws-sdk": "^2.927.0",
+    "date-fns": "^2.22.1",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zupaazhai/s3-uploader.git"
+  },
+  "author": "Supachai Wongmoon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zupaazhai/s3-uploader/issues"
+  },
+  "homepage": "https://github.com/zupaazhai/s3-uploader#readme"
+}
