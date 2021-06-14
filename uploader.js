@@ -2,11 +2,17 @@ require('dotenv').config()
 const AWS = require('aws-sdk')
 const fs = require('fs')
 const path = require('path')
+const util = require('./util')
+
 const fileDir =  path.join(__dirname, 'files')
 
 const credentials = new AWS.SharedIniFileCredentials({
     profile: process.env.AWS_CREDENTIALS_PROFILE
 })
+
+const ignoreFiles = [
+    '.gitignore'
+]
 
 AWS.config.credentials = credentials
 
@@ -21,6 +27,11 @@ AWS.config.getCredentials(err => {
     const files = fs.readdirSync(fileDir)
 
     files.forEach(filename => {
+
+        if (ignoreFiles.includes(filename)) {
+            return
+        }
+
         let filepath = path.join(fileDir, filename)
         let file = fs.readFileSync(filepath)
 
@@ -35,7 +46,9 @@ AWS.config.getCredentials(err => {
                 return console.log(err)
             }
 
-            console.log(`File uploaded to ${data.Location}`)
+            let logMsg = `${filename} uploaded to ${data.Location}`
+            console.log(logMsg)
+            util.writeLog(logMsg)
         })
     })
 })
