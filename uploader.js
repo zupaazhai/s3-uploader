@@ -15,6 +15,23 @@ const ignoreFiles = [
 ]
 
 AWS.config.credentials = credentials
+const s3 = new AWS.S3()
+
+function upload(params, filename) {
+    return new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+            if (err) {
+                return reject(err)
+            }
+
+            let logMsg = `${filename} uploaded to ${data.Location}`
+            console.log(logMsg)
+
+            util.writeLog(logMsg)
+            resolve(params)
+        })
+    })
+}
 
 AWS.config.getCredentials(err => {
     if (err) {
@@ -23,9 +40,7 @@ AWS.config.getCredentials(err => {
 
     console.log('Access key: ', AWS.config.credentials.accessKeyId)
 
-    const s3 = new AWS.S3()
-
-    fs.readdir(fileDir, (err, files) => {
+    fs.readdir(fileDir, async (err, files) => {
 
         for (let index = 0; index < files.length; index++) {
 
@@ -43,17 +58,7 @@ AWS.config.getCredentials(err => {
                 Body: file
             }
 
-            s3.upload(params, (err, data) => {
-                if (err) {
-                    return console.log(err)
-                }
-
-                let logMsg = `${filename} uploaded to ${data.Location}`
-                console.log(logMsg)
-
-                util.writeLog(logMsg)
-            })
+            await upload(params, filename)
         }
-
     })
 })
