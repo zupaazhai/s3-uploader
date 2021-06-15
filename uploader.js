@@ -33,7 +33,7 @@ function upload(filename, filepath, params) {
                         return console.log(err)
                     }
 
-                    console.log(`${filename} deleted`)
+                    console.log(`[X] ${filepath} deleted`)
                 })
             }
 
