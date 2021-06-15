@@ -24,31 +24,36 @@ AWS.config.getCredentials(err => {
     console.log('Access key: ', AWS.config.credentials.accessKeyId)
 
     const s3 = new AWS.S3()
-    const files = fs.readdirSync(fileDir)
 
-    files.forEach(filename => {
+    fs.readdir(fileDir, (err, files) => {
 
-        if (ignoreFiles.includes(filename)) {
-            return
-        }
+        for (let index = 0; index < files.length; index++) {
 
-        let filepath = path.join(fileDir, filename)
-        let file = fs.readFileSync(filepath)
-
-        let params = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: filename,
-            Body: file
-        }
-
-        s3.upload(params, (err, data) => {
-            if (err) {
-                return console.log(err)
+            if (ignoreFiles.includes(files[index])) {
+                continue;
             }
 
-            let logMsg = `${filename} uploaded to ${data.Location}`
-            console.log(logMsg)
-            util.writeLog(logMsg)
-        })
+            let filename = files[index]
+            let filepath = path.join(fileDir, filename)
+            let file = fs.readFileSync(filepath)
+
+            let params = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: filename,
+                Body: file
+            }
+
+            s3.upload(params, (err, data) => {
+                if (err) {
+                    return console.log(err)
+                }
+
+                let logMsg = `${filename} uploaded to ${data.Location}`
+                console.log(logMsg)
+
+                util.writeLog(logMsg)
+            })
+        }
+
     })
 })
