@@ -17,7 +17,7 @@ const ignoreFiles = [
 AWS.config.credentials = credentials
 const s3 = new AWS.S3()
 
-function upload(params, filename) {
+function upload(filename, filepath, params) {
     return new Promise((resolve, reject) => {
         s3.upload(params, (err, data) => {
             if (err) {
@@ -26,6 +26,16 @@ function upload(params, filename) {
 
             let logMsg = `${filename} uploaded to ${data.Location}`
             console.log(logMsg)
+
+            if (data.Location) {
+                fs.unlink(filepath, err => {
+                    if (err) {
+                        return console.log(err)
+                    }
+
+                    console.log(`${filename} deleted`)
+                })
+            }
 
             util.writeLog(logMsg)
             resolve(params)
@@ -58,7 +68,7 @@ AWS.config.getCredentials(err => {
                 Body: file
             }
 
-            await upload(params, filename)
+            await upload(filename, filepath, params)
         }
     })
 })
